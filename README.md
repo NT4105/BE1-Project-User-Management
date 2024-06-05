@@ -4,7 +4,7 @@
 
 - Compile the Java files using the following command:
   ```
-  Open on ternimal
+  Open on terminal
   ```
   javac -d . main/java/com/project/exception/_.java main/java/com/project/model/_.java main/java/com/project/services/_.java main/java/com/project/util/_.java main/java/com/project/view/\*.java Main.java
   ```
