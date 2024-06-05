@@ -4,7 +4,11 @@
 
 - Compile the Java files using the following command:
   ```
-  javac -d . main/java/com/project/exception/*.java main/java/com/project/model/*.java main/java/com/project/services/*.java main/java/com/project/util/*.java main/java/com/project/view/*.java Main.java
+  Open on ternimal
+  ```
+  javac -d . main/java/com/project/exception/_.java main/java/com/project/model/_.java main/java/com/project/services/_.java main/java/com/project/util/_.java main/java/com/project/view/\*.java Main.java
+  ```
+
   ```
 - Run the application using:
   ```
