@@ -13,7 +13,8 @@ public class ValidationUtil {
         return isValidUsername(user.getUsername()) &&
                isValidPassword(user.getPassword()) &&
                isValidPhone(user.getPhone()) &&
-               isValidEmail(user.getEmail());
+               isValidEmail(user.getEmail()) &&
+               isPasswordConfirmed(user.getPassword(), user.getConfirmpassword());
     }
 
     public static boolean isValidUsername(String username) {
@@ -30,5 +31,9 @@ public class ValidationUtil {
 
     public static boolean isValidEmail(String email) {
         return EMAIL_PATTERN.matcher(email).matches();
+    }
+
+    public static boolean isPasswordConfirmed(String password, String confirmpassword) {
+        return password != null && password.equals(confirmpassword);
     }
 }

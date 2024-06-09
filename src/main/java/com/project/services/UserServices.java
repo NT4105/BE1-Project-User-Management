@@ -2,7 +2,6 @@ package main.java.com.project.services;
 
 import main.java.com.project.model.User;
 import main.java.com.project.util.FileUtil;
-import main.java.com.project.util.ValidationUtil;
 import main.java.com.project.exception.UserNotFoundException;
 import main.java.com.project.exception.UserAlreadyExistsException;
 
@@ -13,8 +12,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.logging.Level;
 
-
-
 public class UserServices {
     private List<User> users;
     private static final Logger logger = Logger.getLogger(UserServices.class.getName());
@@ -24,31 +21,29 @@ public class UserServices {
     }
     public void createUser(User user) {
         try {
-            if (ValidationUtil.isValidUser(user)) {
-                user.setPassword(user.getPassword()); // Hash the password before adding the user
+            if (user.isValidUser()) {
+                user.setPassword(User.hashPassword(user.getPassword())); // Hash the password before adding the user
                 users.add(user);
                 saveUsersToFile();
-                logger.log(Level.INFO,"User created successfully: " + user.getUsername());
+                logger.log(Level.INFO, "User created successfully: " + user.getUsername());
             } else {
-                logger.log(Level.WARNING,"Invalid user data: " + user);
+                logger.log(Level.WARNING, "Invalid user data: " + user.getValidationMessage());
             }
         } catch (UserAlreadyExistsException e) {
-            System.out.println("Error creating user: " + e.getMessage());
+                System.out.println("Error creating user: " + e.getMessage());
         }
     }
 
     public boolean checkUser(String userNameToCheck) {
         try {
-            List<User> users = FileUtil.loadUsers(); // Load users from file
+            List<User> users = FileUtil.loadUsers();    // Load users from file
             boolean userExists = users.stream()
                     .anyMatch(u -> u.getUsername().equals(userNameToCheck));
-
             if (userExists) {
                 System.out.println("Exist User");
             } else {
                 System.out.println("No User Found!");
             }
-
             return userExists;
         } catch (Exception e) {
             System.out.println("Error checking user: " + e.getMessage());
@@ -79,19 +74,24 @@ public class UserServices {
 
     public void updateUser(User user) {
         try {
-            Optional<User> existingUserOptional = users.stream()
-                    .filter(u -> u.getUsername().equals(user.getUsername()))
-                    .findFirst();
-    
-            if (existingUserOptional.isPresent()) {
-                User existingUser = existingUserOptional.get();
-                updateExistingUser(existingUser, user);
-                saveUsersToFile();
-                logger.log(Level.INFO,"User updated successfully: " + user.getUsername());
+            if (user.isValidUser()) {
+                Optional<User> existingUserOptional = users.stream()
+                        .filter(u -> u.getUsername().equals(user.getUsername()))
+                        .findFirst();
+
+                if (existingUserOptional.isPresent()) {
+                    User existingUser = existingUserOptional.get();
+                    updateExistingUser(existingUser, user);
+                    saveUsersToFile();
+                    logger.log(Level.INFO, "User updated successfully: " + user.getUsername());
+                } else {
+                    String message = "Username does not exist.";
+                    logger.log(Level.WARNING, message);
+                    System.out.println(message);
+                    throw new UserNotFoundException(message);
+                }
             } else {
-                String message = "Username does not exist.";
-                logger.log(Level.WARNING,message);
-                throw new UserNotFoundException(message);
+                logger.log(Level.WARNING, "Invalid user data: " + user.getValidationMessage());
             }
         } catch (UserNotFoundException e) {
             System.out.println("Error updating user: " + e.getMessage());
@@ -102,12 +102,24 @@ public class UserServices {
     
 
     private void updateExistingUser(User existingUser, User newUser) {
-        existingUser.setFirstname(newUser.getFirstname());
-        existingUser.setLastname(newUser.getLastname());
-        existingUser.setPassword(newUser.getPassword());
-        existingUser.setConfirmpassword(newUser.getConfirmpassword());
-        existingUser.setPhone(newUser.getPhone());
-        existingUser.setEmail(newUser.getEmail());
+        if (newUser.getFirstname() != null && !newUser.getFirstname().isEmpty()) {
+            existingUser.setFirstname(newUser.getFirstname());
+        }
+        if (newUser.getLastname() != null && !newUser.getLastname().isEmpty()) {
+            existingUser.setLastname(newUser.getLastname());
+        }
+        if (newUser.getPassword() != null && !newUser.getPassword().isEmpty()) {
+            existingUser.setPassword(User.hashPassword(newUser.getPassword())); // Hash the new password before updating
+        }
+        if (newUser.getConfirmpassword() != null && !newUser.getConfirmpassword().isEmpty()) {
+            existingUser.setConfirmpassword(newUser.getConfirmpassword());
+        }
+        if (newUser.getPhone() != null && !newUser.getPhone().isEmpty()) {
+            existingUser.setPhone(newUser.getPhone());
+        }
+        if (newUser.getEmail() != null && !newUser.getEmail().isEmpty()) {
+            existingUser.setEmail(newUser.getEmail());
+        }
     }
 
     public void deleteUser(String username) {

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class FileUtil {
 
-    private static final String FILE_NAME = "src/main/resources/user.dat";
+    private static final String FILE_NAME = "src\\main\\resources\\user.dat";
 
     public static List<User> loadUsers() {
         List<User> users = new ArrayList<>();

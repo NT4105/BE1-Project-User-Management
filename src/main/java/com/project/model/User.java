@@ -69,7 +69,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = hashPassword(password);
+        this.password = password;
     }
 
     public void setConfirmpassword(String confirmpassword) {
@@ -144,7 +144,7 @@ public class User {
     }
 
     // Encrypt password(SHA256) before saving to file.	
-    private String hashPassword(String password) {
+    public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(password.getBytes());
